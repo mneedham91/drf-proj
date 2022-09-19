@@ -6,19 +6,19 @@ from rest_framework import serializers
 class TeamSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Team
-        fields = ['city', 'mascot', 'abbreviation', 'wins', 'losses', 'ties']
+        fields = ['id', 'city', 'mascot', 'abbreviation', 'wins', 'losses', 'ties']
 
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Player
-        fields = ['team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
+        fields = ['id', 'team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
 
 
 class SubscriptionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Subscription
-        fields = ['type', 'user', 'player', 'team']
+        fields = ['id', 'type', 'user', 'player', 'team']
 
     def validate(self, data):
         """
@@ -36,10 +36,10 @@ class SubscriptionSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ['id', 'url', 'username', 'email', 'groups']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
-        fields = ['url', 'name']
+        fields = ['id', 'url', 'name']
