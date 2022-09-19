@@ -12,6 +12,14 @@ class PlayerViewSet(viewsets.ModelViewSet):
     """
     queryset = Player.objects.all().order_by('-last_name')
     serializer_class = PlayerSerializer
+    permission_classes = [permissions.AllowAny]
+
+    # Anyone can GET a player record or list
+    # Only Admins can perform other operations
+    def get_permissions(self):
+        if self.request.method != 'GET':
+            return [permissions.IsAdminUser()]
+        return super().get_permissions()
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -20,6 +28,14 @@ class TeamViewSet(viewsets.ModelViewSet):
     """
     queryset = Team.objects.all().order_by('-abbreviation')
     serializer_class = TeamSerializer
+    permission_classes = [permissions.AllowAny]
+
+    # Anyone can GET a team record or list
+    # Only Admins can perform other operations
+    def get_permissions(self):
+        if self.request.method != 'GET':
+            return [permissions.IsAdminUser()]
+        return super().get_permissions()
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
@@ -36,7 +52,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 
 class GroupViewSet(viewsets.ModelViewSet):
