@@ -6,7 +6,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'players', views.PlayerViewSet)
-router.register(r'subscriptions', views.SubscriptionViewSet)
+router.register(r'subscriptions', views.SubscriptionViewSet, 'subscriptions')
 router.register(r'teams', views.TeamViewSet)
 
 urlpatterns = [

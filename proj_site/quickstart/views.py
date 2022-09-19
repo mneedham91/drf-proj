@@ -6,6 +6,14 @@ from quickstart.serializers import UserSerializer, GroupSerializer, \
      PlayerSerializer, TeamSerializer, SubscriptionSerializer
 
 
+class IsOwner(permissions.BasePermission):
+    """
+    Checks if the user is the user on the record
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
+
 class PlayerViewSet(viewsets.ModelViewSet):
     """
     API endpoint for NFL Players
@@ -42,8 +50,15 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     """
     API endpoint for subscriptions
     """
-    queryset = Subscription.objects.all().order_by('-user')
     serializer_class = SubscriptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Subscription.objects.all().order_by('-user')
+        elif self.request.user.is_authenticated:
+            return Subscription.objects.filter(user=self.request.user)
 
 
 class UserViewSet(viewsets.ModelViewSet):

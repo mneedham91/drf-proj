@@ -19,16 +19,17 @@ class SubscriptionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Subscription
         fields = ['id', 'type', 'user', 'player', 'team']
+        read_only_fields = ['user']
 
     def validate(self, data):
         """
         A subscription should be for a particular player or team
         """
-        if data['player'] and data['team']:
+        if data.get('player') and data.get('team'):
             raise serializers.ValidationError("A subscription can be for a player or a team, not both")
-        if data['type'] == 'Player' and not data['player']:
+        if data.get('type') == 'Player' and not data.get('player'):
             raise serializers.ValidationError("A Player subscription requires a Player value")
-        if data['type'] == 'Team' and not data['team']:
+        if data.get('type') == 'Team' and not data.get('team'):
             raise serializers.ValidationError("A Team subscription requires a Team value")
         return data
 
