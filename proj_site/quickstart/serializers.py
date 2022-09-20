@@ -3,38 +3,21 @@ from quickstart.models import Team, Player, Subscription
 from rest_framework import serializers
 
 
-class TeamSerializer(serializers.HyperlinkedModelSerializer):
+class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['id', 'city', 'mascot', 'abbreviation', 'wins', 'losses', 'ties']
 
 
-class PlayerSerializer(serializers.HyperlinkedModelSerializer):
+class PlayerSerializer(serializers.ModelSerializer):
+    team = TeamSerializer(read_only=True)
+
     class Meta:
         model = Player
         fields = ['id', 'team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
 
 
-class SubscriptionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Subscription
-        fields = ['id', 'type', 'user', 'player', 'team']
-        read_only_fields = ['user']
-
-    def validate(self, data):
-        """
-        A subscription should be for a particular player or team
-        """
-        if data.get('player') and data.get('team'):
-            raise serializers.ValidationError("A subscription can be for a player or a team, not both")
-        if data.get('type') == 'Player' and not data.get('player'):
-            raise serializers.ValidationError("A Player subscription requires a Player value")
-        if data.get('type') == 'Team' and not data.get('team'):
-            raise serializers.ValidationError("A Team subscription requires a Team value")
-        return data
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
@@ -50,7 +33,29 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'url', 'username', 'password', 'email', 'groups']
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class SubscriptionSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer(read_only=True)
+    team = TeamSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Subscription
+        fields = ['id', 'type', 'user', 'player', 'team']
+
+    def validate(self, data):
+        """
+        A subscription should be for a particular player or team
+        """
+        if data.get('player') and data.get('team'):
+            raise serializers.ValidationError("A subscription can be for a player or a team, not both")
+        if data.get('type') == 'Player' and not data.get('player'):
+            raise serializers.ValidationError("A Player subscription requires a Player value")
+        if data.get('type') == 'Team' and not data.get('team'):
+            raise serializers.ValidationError("A Team subscription requires a Team value")
+        return data
+
+
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'url', 'name']
