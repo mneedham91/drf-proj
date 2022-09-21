@@ -6,7 +6,7 @@ from rest_framework import serializers
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['id', 'city', 'mascot', 'abbreviation', 'wins', 'losses', 'ties']
+        fields = ['id', 'url', 'city', 'mascot', 'abbreviation', 'wins', 'losses', 'ties']
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['id', 'team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
+        fields = ['id', 'url', 'team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,13 +34,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    player = PlayerSerializer(read_only=True)
-    team = TeamSerializer(read_only=True)
+    team = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, default=None)
+    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all(), allow_null=True, default=None)
     user = UserSerializer(read_only=True)
 
     class Meta:
         model = Subscription
         fields = ['id', 'type', 'user', 'player', 'team']
+
+    def to_representation(self, obj):
+        self.fields['team'] = TeamSerializer()
+        self.fields['player'] = PlayerSerializer()
+        representation = super().to_representation(obj)
+        # Hide/show the player and team fields when appropriate
+        if representation['type'] == 'Player':
+            self.fields.pop('team')
+        if representation['type'] == 'Team':
+            self.fields.pop('player')
+        return super().to_representation(obj)
 
     def validate(self, data):
         """

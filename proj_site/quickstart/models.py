@@ -41,8 +41,8 @@ class Subscription(models.Model):
     )
     type = models.CharField(max_length=6, choices=SUBSCRIPTION_TYPES)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, blank=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         if self.type == 'Team':

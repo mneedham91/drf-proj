@@ -3,6 +3,8 @@ from rest_framework import routers
 from quickstart import views
 
 router = routers.DefaultRouter()
+router.get_api_root_view().cls.__name__ = "Test API"
+router.get_api_root_view().cls.__doc__ = "Subscribe to NFL teams and players"
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'players', views.PlayerViewSet)
