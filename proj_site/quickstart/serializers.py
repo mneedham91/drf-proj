@@ -10,11 +10,15 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class PlayerSerializer(serializers.ModelSerializer):
-    team = TeamSerializer(read_only=True)
+    team = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, default=None)
 
     class Meta:
         model = Player
         fields = ['id', 'url', 'team', 'first_name', 'last_name', 'position', 'yardage', 'touchdowns']
+
+    def to_representation(self, obj):
+        self.fields['team'] = TeamSerializer()
+        return super().to_representation(obj)
 
 
 class UserSerializer(serializers.ModelSerializer):
